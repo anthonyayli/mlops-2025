@@ -1113,6 +1113,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "ipykernel" },
     { name = "jupyter" },
 ]
 
@@ -1126,7 +1127,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "jupyter", specifier = ">=1.1.1" }]
+dev = [
+    { name = "ipykernel", specifier = ">=6.30.1" },
+    { name = "jupyter", specifier = ">=1.1.1" },
+]
 
 [[package]]
 name = "nbclient"
