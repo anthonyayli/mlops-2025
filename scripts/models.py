@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, MinMaxScaler, KBinsDiscretizer
 from sklearn.pipeline import Pipeline
-from featurize import get_num_cat_tranformation, get_bins
+from featurize import get_cat_tranformation, get_bins
 def build_parser():
     p = argparse.ArgumentParser(description="Train model on Titanic dataset")
     p.add_argument("--train-features", required=True, help="Path to training features CSV")
@@ -23,7 +23,7 @@ def load_data(features_path, labels_path):
     return X, y
 
 def train_model(X_train, y_train):
-    num_cat_tranformation = get_num_cat_tranformation()
+    num_cat_tranformation = get_cat_tranformation()
     bins = get_bins()
     
     pipeline = Pipeline([

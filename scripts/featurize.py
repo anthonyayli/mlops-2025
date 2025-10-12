@@ -27,10 +27,12 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 def engineering_data(df):
     data = pd.read_csv(df)
-    data['Survived'] = data['Survived'].astype('int64')
-    data = data.drop("PassengerId", axis=1)
-    X = data.drop("Survived", axis=1)
-    Y = data["Survived"]
+
+    train_data = data.dropna(subset=['Survived'])
+    train_data['Survived'] = train_data['Survived'].astype('int64')
+    train_data = train_data.drop("PassengerId", axis=1)
+    X = train_data.drop("Survived", axis=1)
+    Y = train_data["Survived"]
     X_train, X_test, y_train, y_test=train_test_split(X,Y,test_size=0.2)
     return X_train, X_test, y_train, y_test
 
