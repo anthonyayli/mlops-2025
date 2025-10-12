@@ -8,13 +8,13 @@ set -e  # Exit on any error
 echo "Starting Model Training and Evaluation"
 echo "====================================="
 
-# Ensure we have the processed data
+
 if [ ! -f "data/processed/train_features.csv" ]; then
     echo "Error: Processed data not found. Please run the pipeline first."
     exit 1
 fi
 
-# Train RandomForest Model
+
 echo ""
 echo "Training RandomForest model..."
 uv run python scripts/random_forest_model.py \
@@ -31,7 +31,7 @@ uv run python scripts/evaluate.py \
 
 echo "RandomForest evaluation completed!"
 
-# Train XGBoost Model
+
 echo ""
 echo "Training XGBoost model..."
 uv run python scripts/xgboost_model.py \

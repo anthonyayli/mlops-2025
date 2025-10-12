@@ -46,10 +46,10 @@ def main():
     args = build_parser().parse_args()
     rf_model = RandomForestModel()
     
-    # Load data
+   
     X_train, y_train = rf_model.load_data(args.train_features, args.train_labels)
     
-    # Train model
+ 
     model = rf_model.train_model(X_train, y_train)
     rf_model.save_model(model, args.model_output)
     

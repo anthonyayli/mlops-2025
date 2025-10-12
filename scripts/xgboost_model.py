@@ -60,10 +60,10 @@ def main():
     
     xgb_model = XGBoostModel()
     
-    # Load data
+  
     X_train, y_train = xgb_model.load_data(args.train_features, args.train_labels)
     
-    # Train model
+
     model = xgb_model.train_model(X_train, y_train)
     xgb_model.save_model(model, args.model_output)
     
