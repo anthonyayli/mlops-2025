@@ -7,7 +7,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import KBinsDiscretizer
-from featurizer_interface import FeaturizerInterface
+from featurize_interface import FeaturizerInterface
 
 warnings.filterwarnings("ignore")
 
