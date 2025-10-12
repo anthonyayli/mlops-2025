@@ -3,8 +3,47 @@ import argparse
 import pandas as pd
 import numpy as np
 import warnings
+from preprocessing_interface import PreprocessorInterface
 
 warnings.filterwarnings("ignore")
+
+
+class TitanicPreprocessor(PreprocessorInterface):
+    
+    def family_size(self, number):
+        if number==1:
+            return "Alone"
+        elif number>1 and number <5:
+            return "Small"
+        else:
+            return "Large"
+    
+    def preprocess_data(self, train_path, test_path):
+        train = pd.read_csv(train_path)
+        test = pd.read_csv(test_path)
+        
+        train.drop(columns=['Cabin'], inplace=True)
+        test.drop(columns=['Cabin'], inplace=True)
+        
+        train['Embarked'].fillna('S', inplace=True)
+        test['Fare'].fillna(test['Fare'].mean(), inplace=True)
+        
+        df = pd.concat([train, test], sort=True).reset_index(drop=True)
+        
+        df['Age'] = df.groupby(['Sex', 'Pclass'])['Age'].transform(lambda x: x.fillna(x.median()))
+        df['Title']=df['Name'].str.split(", ",expand=True)[1].str.split(".",expand=True)[0]
+
+        df['Age'] = df['Age'].astype('int64')
+        df['Title'] = df['Title'].replace(['Lady', 'the Countess','Capt', 'Col','Don', 'Dr', 'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare')
+        df['Title'] = df['Title'].replace('Mlle', 'Miss')
+        df['Title'] = df['Title'].replace('Ms', 'Miss')
+        df['Title'] = df['Title'].replace('Mme', 'Mrs')
+      
+        df['Family_size']=df['SibSp'] + df['Parch'] + 1
+        df.drop(columns=['Name','Parch','SibSp','Ticket'],inplace=True)
+        df['Family_size']=df['Family_size'].apply(self.family_size)
+        
+        return df
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -15,48 +54,11 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def family_size(number):
-    if number==1:
-        return "Alone"
-    elif number>1 and number <5:
-        return "Small"
-    else:
-        return "Large"
-
-
-def preprocess_data(train_path, test_path):
-    train = pd.read_csv(train_path)
-    test = pd.read_csv(test_path)
-    
-    train.drop(columns=['Cabin'], inplace=True)
-    test.drop(columns=['Cabin'], inplace=True)
-    
-    train['Embarked'].fillna('S', inplace=True)
-    test['Fare'].fillna(test['Fare'].mean(), inplace=True)
-    
-    df = pd.concat([train, test], sort=True).reset_index(drop=True)
-    
-    df['Age'] = df.groupby(['Sex', 'Pclass'])['Age'].transform(lambda x: x.fillna(x.median()))
-    df['Title']=df['Name'].str.split(", ",expand=True)[1].str.split(".",expand=True)[0]
-
-    df['Age'] = df['Age'].astype('int64')
-    df['Title'] = df['Title'].replace(['Lady', 'the Countess','Capt', 'Col','Don', 'Dr', 'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare')
-    df['Title'] = df['Title'].replace('Mlle', 'Miss')
-    df['Title'] = df['Title'].replace('Ms', 'Miss')
-    df['Title'] = df['Title'].replace('Mme', 'Mrs')
-  
-    df['Family_size']=df['SibSp'] + df['Parch'] + 1
-    df.drop(columns=['Name','Parch','SibSp','Ticket'],inplace=True)
-    df['Family_size']=df['Family_size'].apply(family_size)
-    
-    return df
-
-
-
 def main():
     args = build_parser().parse_args()
     
-    df_processed = preprocess_data(args.input_train, args.input_test)
+    preprocessor = TitanicPreprocessor()
+    df_processed = preprocessor.preprocess_data(args.input_train, args.input_test)
     
     df_processed.to_csv(args.output, index=False)
 
