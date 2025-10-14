@@ -3,10 +3,7 @@ import pandas as pd
 import pickle
 import os
 from sklearn.linear_model import LogisticRegression
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, MinMaxScaler, KBinsDiscretizer
-from sklearn.pipeline import Pipeline
-from featurize import get_cat_tranformation, get_bins
+# Transformations are now handled in featurize.py
 from base_model_interface import ModelInterface
 
 class TitanicModel(ModelInterface):
@@ -15,20 +12,17 @@ class TitanicModel(ModelInterface):
         y = pd.read_csv(labels_path)
         if isinstance(y, pd.DataFrame):
             y = y.iloc[:, 0]
+        # Convert to numpy arrays since features are already transformed
+        X = X.values
+        y = y.values if hasattr(y, 'values') else y
         return X, y
 
     def train_model(self, X_train, y_train):
-        num_cat_tranformation = get_cat_tranformation()
-        bins = get_bins()
-        
-        pipeline = Pipeline([
-            ('num_cat_transform', num_cat_tranformation),
-            ('binning', bins),
-            ('classifier', LogisticRegression(max_iter=1000, random_state=42))
-        ])
-        
-        pipeline.fit(X_train, y_train)
-        return pipeline
+        # Features are already transformed in featurize.py
+        # Just train the classifier directly
+        classifier = LogisticRegression(max_iter=1000, random_state=42)
+        classifier.fit(X_train, y_train)
+        return classifier
 
     def save_model(self, model, model_path):
         os.makedirs(os.path.dirname(model_path), exist_ok=True)

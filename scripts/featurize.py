@@ -22,7 +22,24 @@ class TitanicFeaturizer(FeaturizerInterface):
         X = train_data.drop("Survived", axis=1)
         Y = train_data["Survived"]
         X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2)
-        return X_train, X_test, y_train, y_test
+        
+        # Apply transformations
+        num_cat_transformation = self.get_cat_tranformation()
+        bins = self.get_bins()
+        
+        # Transform training data
+        X_train_transformed = num_cat_transformation.fit_transform(X_train)
+        X_train_final = bins.fit_transform(X_train_transformed)
+        
+        # Transform test data using fitted transformers
+        X_test_transformed = num_cat_transformation.transform(X_test)
+        X_test_final = bins.transform(X_test_transformed)
+        
+        # Convert back to DataFrames for CSV saving
+        X_train_df = pd.DataFrame(X_train_final)
+        X_test_df = pd.DataFrame(X_test_final)
+        
+        return X_train_df, X_test_df, y_train, y_test
     
     def get_cat_tranformation(self):
         num_cat_tranformation = ColumnTransformer([

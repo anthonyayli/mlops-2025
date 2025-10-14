@@ -21,23 +21,20 @@ class XGBoostModel(ModelInterface):
         y = pd.read_csv(labels_path)
         if isinstance(y, pd.DataFrame):
             y = y.iloc[:, 0]
+        # Convert to numpy arrays since features are already transformed
+        X = X.values
+        y = y.values if hasattr(y, 'values') else y
         return X, y
 
     def train_model(self, X_train, y_train):
         if not XGBOOST_AVAILABLE:
             raise ImportError("XGBoost is not installed. Please install with: pip install xgboost")
             
-        num_cat_tranformation = get_cat_tranformation()
-        bins = get_bins()
-        
-        pipeline = Pipeline([
-            ('num_cat_transform', num_cat_tranformation),
-            ('binning', bins),
-            ('classifier', xgb.XGBClassifier(n_estimators=100, random_state=42, eval_metric='logloss'))
-        ])
-        
-        pipeline.fit(X_train, y_train)
-        return pipeline
+        # Features are already transformed in featurize.py
+        # Just train the classifier directly
+        classifier = xgb.XGBClassifier(n_estimators=100, random_state=42, eval_metric='logloss')
+        classifier.fit(X_train, y_train)
+        return classifier
 
     def save_model(self, model, model_path):
         os.makedirs(os.path.dirname(model_path), exist_ok=True)

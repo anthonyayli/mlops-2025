@@ -22,6 +22,9 @@ def load_data(features_path, labels_path):
     y = pd.read_csv(labels_path)
     if isinstance(y, pd.DataFrame):
         y = y.iloc[:, 0]
+    # Convert to numpy arrays since features are already transformed
+    X = X.values
+    y = y.values if hasattr(y, 'values') else y
     return X, y
 
 def compute_metrics(model, X_test, y_test):
