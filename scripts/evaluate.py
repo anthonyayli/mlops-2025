@@ -2,13 +2,15 @@ import argparse
 import pandas as pd
 import pickle
 import json
+import os
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def build_parser():
     p = argparse.ArgumentParser(description="Evaluate trained model")
     p.add_argument("--model", required=True, help="Path to trained model pickle file")
-    p.add_argument("--test-features", required=True, help="Path to test features CSV")
+    p.add_argument("--test-features", required=True, help="Path to raw test features CSV")
     p.add_argument("--test-labels", required=True, help="Path to test labels CSV")
+    p.add_argument("--transformers-dir", default="transformers", help="Directory containing saved transformers")
     p.add_argument("--metrics-output", help="Optional path to save metrics as JSON")
     return p
 
@@ -17,13 +19,38 @@ def load_model(model_path):
         model = pickle.load(f)
     return model
 
-def load_data(features_path, labels_path):
-    X = pd.read_csv(features_path)
+def process_test_data_with_transformers(test_features_path, transformers_dir):
+    """Process raw test data using saved transformers"""
+    # Load raw test data
+    X_test_raw = pd.read_csv(test_features_path)
+    
+    # Load transformers
+    with open(os.path.join(transformers_dir, 'num_cat_transformer.pkl'), 'rb') as f:
+        num_cat_transformer = pickle.load(f)
+    
+    with open(os.path.join(transformers_dir, 'bins_transformer.pkl'), 'rb') as f:
+        bins_transformer = pickle.load(f)
+    
+    # Transform test data using fitted transformers
+    X_test_transformed = num_cat_transformer.transform(X_test_raw)
+    X_test_final = bins_transformer.transform(X_test_transformed)
+    
+    return X_test_final
+
+def load_data(features_path, labels_path, transformers_dir=None):
+    if transformers_dir:
+        # Process raw test data using transformers
+        X = process_test_data_with_transformers(features_path, transformers_dir)
+        if X is None:
+            raise ValueError("Failed to process test data")
+    else:
+        # Load already processed data
+        X = pd.read_csv(features_path)
+        X = X.values
+    
     y = pd.read_csv(labels_path)
     if isinstance(y, pd.DataFrame):
         y = y.iloc[:, 0]
-    # Convert to numpy arrays since features are already transformed
-    X = X.values
     y = y.values if hasattr(y, 'values') else y
     return X, y
 
@@ -53,7 +80,7 @@ def main():
     args = build_parser().parse_args()
     
     model = load_model(args.model)
-    X_test, y_test = load_data(args.test_features, args.test_labels)
+    X_test, y_test = load_data(args.test_features, args.test_labels, args.transformers_dir)
     
     metrics = compute_metrics(model, X_test, y_test)
     print_metrics(metrics)

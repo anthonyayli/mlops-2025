@@ -44,6 +44,20 @@ class TitanicPreprocessor(PreprocessorInterface):
         df['Family_size']=df['Family_size'].apply(self.family_size)
         
         return df
+    
+    def prepare_train_test_data(self, df_processed):
+        """Separate train and test data from processed dataframe"""
+        # Get training data (rows with Survived values)
+        train_data = df_processed.dropna(subset=['Survived']).copy()
+        train_data['Survived'] = train_data['Survived'].astype('int64')
+        train_data = train_data.drop("PassengerId", axis=1)
+        
+        # Get test data (rows without Survived values)
+        test_data = df_processed[df_processed['Survived'].isna()].copy()
+        test_data = test_data.drop("PassengerId", axis=1)
+        test_data = test_data.drop("Survived", axis=1)  # Remove Survived column from test data
+        
+        return train_data, test_data
 
 
 def build_parser() -> argparse.ArgumentParser:

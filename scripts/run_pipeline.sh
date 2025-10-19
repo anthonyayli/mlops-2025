@@ -31,7 +31,8 @@ uv run python scripts/featurize.py \
     --output-train-features data/processed/train_features.csv \
     --output-train-labels data/processed/train_labels.csv \
     --output-test-features data/processed/test_features.csv \
-    --output-test-labels data/processed/test_labels.csv
+    --output-test-labels data/processed/test_labels.csv \
+    --transformers-output transformers
 
 echo "Feature engineering completed!"
 
@@ -52,6 +53,7 @@ uv run python scripts/evaluate.py \
     --model models/model.pkl \
     --test-features data/processed/test_features.csv \
     --test-labels data/processed/test_labels.csv \
+    --transformers-dir transformers \
     --metrics-output metrics.json
 
 echo "Model evaluation completed!"

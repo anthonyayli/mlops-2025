@@ -2,10 +2,6 @@ import argparse
 import pandas as pd
 import pickle
 import os
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, MinMaxScaler, KBinsDiscretizer
-from sklearn.pipeline import Pipeline
-from featurize import get_cat_tranformation, get_bins
 from base_model_interface import ModelInterface
 
 try:
