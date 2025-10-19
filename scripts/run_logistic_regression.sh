@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# MLOps Pipeline Runner Script
-# This script runs the complete machine learning pipeline for the Titanic dataset
+# Logistic Regression Pipeline Runner Script
+# This script runs the complete Logistic Regression pipeline for the Titanic dataset
 
 set -e  # Exit on any error
 
-echo "Starting MLOps Pipeline for Titanic Dataset"
-echo "=========================================="
+echo "Starting Logistic Regression Pipeline for Titanic Dataset"
+echo "========================================================"
 
 # Create necessary directories
 echo "Creating necessary directories..."
@@ -39,7 +39,7 @@ echo "Feature engineering completed!"
 # Step 3: Model Training
 echo ""
 echo "Step 3: Training model..."
-uv run python scripts/models.py \
+uv run python scripts/LogisticRegression.py \
     --train-features data/processed/train_features.csv \
     --train-labels data/processed/train_labels.csv \
     --model-output models/model.pkl
@@ -58,9 +58,29 @@ uv run python scripts/evaluate.py \
 
 echo "Model evaluation completed!"
 
+# Step 5: Inference
 echo ""
-echo "Pipeline completed successfully!"
-echo "==============================="
+echo "Step 5: Running inference on new data..."
+echo "======================================="
+
+# Check if inference data exists
+if [ ! -f "data/inference_data.csv" ]; then
+    echo "Error: inference_data.csv not found. Please create it first."
+    exit 1
+fi
+
+echo "Making predictions with Logistic Regression model..."
+uv run python scripts/predict.py \
+    --model models/model.pkl \
+    --input-data data/inference_data.csv \
+    --transformers-dir transformers \
+    --output predictions_logistic.csv
+
+echo "Inference completed!"
+
+echo ""
+echo "Logistic Regression Pipeline completed successfully!"
+echo "==================================================="
 echo "Model Performance Metrics:"
 cat metrics.json
 echo ""
@@ -70,7 +90,8 @@ echo "  - data/processed/train_features.csv (training features)"
 echo "  - data/processed/train_labels.csv (training labels)"
 echo "  - data/processed/test_features.csv (test features)"
 echo "  - data/processed/test_labels.csv (test labels)"
-echo "  - models/model.pkl (trained model)"
+echo "  - models/model.pkl (trained Logistic Regression model)"
 echo "  - metrics.json (evaluation metrics)"
+echo "  - predictions_logistic.csv (inference predictions)"
 echo ""
 echo "Ready for deployment!"
