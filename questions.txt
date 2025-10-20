@@ -1,0 +1,41 @@
+What We Should Improve
+1. Reproducibility & Configuration
+
+We should add a configuration file (YAML/JSON) to centralize our hyperparameters, paths, and settings instead of hardcoding them
+We need to implement random seed setting for reproducible results
+We should version our data and models (consider DVC)
+
+2. Error Handling & Validation
+
+We need to add input validation (file existence, data schema checks)
+We should implement proper exception handling with informative error messages
+We need to add data quality checks between our pipeline steps
+
+3. Logging & Monitoring
+
+We should replace print statements with proper logging (using Python's logging module)
+We need to log important metrics, parameters, and intermediate results
+We should add timestamps and execution tracking
+
+4. Code Quality
+
+We need to add type hints to our functions
+We should write unit tests for each script
+We need to add docstrings explaining what each script does
+We should implement proper code formatting (black, ruff)
+
+5. Pipeline Orchestration
+
+Our bash script is basic - we should consider adding:
+
+Dependency checking between steps
+Conditional execution (skip if output already exists)
+Error handling (fail fast vs. continue)
+Parallel execution where possible
+
+
+
+6. Model Management
+
+We should save model metadata (training date, parameters, metrics) alongside our pickle file
+We need to implement model versioning
